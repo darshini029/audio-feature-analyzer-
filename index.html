@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Feature Analyzer</title>
+<style>body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:30px}main{max-width:700px;margin:auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}h1{color:#223}textarea,input[type=text]{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:16px}button{margin-top:10px;padding:10px 16px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:16px;cursor:pointer}button:hover{background:#1d4ed8}#result{margin-top:20px;padding:15px;background:#eef2ff;border-radius:8px;white-space:pre-wrap}small{color:#666}</style>
+</head>
+<body>
+<main>
+<h1>Audio Feature Analyzer</h1>
+<p>Analyze duration and loudness of a local audio file.</p>
+<input type="file" id="file" accept="audio/*"><br><button onclick="analyze()">Analyze Audio</button>
+<div id="result"></div>
+</main>
+<script>
+async function analyze(){const f=document.getElementById('file').files[0];if(!f){document.getElementById('result').textContent='Please choose an audio file.';return}const array=await f.arrayBuffer();const ctx=new(window.AudioContext||window.webkitAudioContext)();const buffer=await ctx.decodeAudioData(array);const data=buffer.getChannelData(0);let sum=0,peak=0;for(let i=0;i<data.length;i++){sum+=data[i]*data[i];peak=Math.max(peak,Math.abs(data[i]))}const rms=Math.sqrt(sum/data.length);document.getElementById('result').textContent=`File: ${f.name}\nDuration: ${buffer.duration.toFixed(2)} seconds\nChannels: ${buffer.numberOfChannels}\nSample rate: ${buffer.sampleRate} Hz\nAverage loudness (RMS): ${rms.toFixed(4)}\nPeak amplitude: ${peak.toFixed(4)}`;ctx.close();}
+</script>
+</body>
+</html>
